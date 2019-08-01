@@ -6,7 +6,8 @@
 #include <ostream>
 #include <algorithm>
 using namespace std;
-enum directions {
+
+enum directions {// Defined enums for directions for use in a switch statement
 		 north,
 		 south,
 		 east,
@@ -17,14 +18,14 @@ enum directions {
 		 southwest
 };
 
-directions hashit (std::string const&);
+directions hashit (std::string const&);// needed for using a switch statement with strings and the directions
 bool vector_contains(vector<string>,string);
-vector<string> string_to_vector(string);
-vector<string> expand_direction(vector<string>);
-vector<string> expand_generational(vector<string>);
-vector<string> break_apart_directions(vector<string>); 
-bool valid_or_not(vector<string>);
-bool test_is_valid(vector<string>);
+vector<string> string_to_vector(string);// converts string into vector deliminates by spaces
+vector<string> expand_direction(vector<string>);// if a n b is given it will try to add b s a if it doesn't already exist
+vector<string> expand_generational(vector<string>);// if a n b and c s b is given c s a should be added ect... 
+vector<string> break_apart_directions(vector<string>); //converts a nw b to a n b and a w b
+bool valid_or_not(vector<string>);// reads list of directions and looks for contraditions.
+bool test_is_valid(vector<string>);// Just calls all the above functions to solve the problem
 
 
 int main()

@@ -4,6 +4,7 @@
 #include <sstream>
 #include <istream>
 #include <ostream>
+#include <algorithm>
 using namespace std;
 enum directions {
 		 north,
@@ -17,35 +18,45 @@ enum directions {
 };
 
 directions hashit (std::string const&);
+bool vector_contains(vector<string>,string);
 vector<string> string_to_vector(string);
 vector<string> expand_direction(vector<string>);
 vector<string> expand_generational(vector<string>);
 vector<string> break_apart_directions(vector<string>); 
-
-
+bool valid_or_not(vector<string>);
+bool test_is_valid(vector<string>);
 
 
 int main()
 {
-  cout << "starting app"<<endl;
+  
   std::vector<string> testcase1;
   testcase1.push_back("a n b");
   testcase1.push_back("b ne c");
   testcase1.push_back("c n a");
 
+  std::vector<string> testcase2;
+  testcase2.push_back("a nw b");
+  testcase2.push_back("a n c");
+  
   auto output = string_to_vector(testcase1[0]);
+  
+  cout<<"test 1 is ";
+  if(test_is_valid(testcase1)){
+    cout<<"true"<<endl;
+  }else{
+    cout << "false"<<endl;
+  }
 
-  testcase1 = break_apart_directions(testcase1); 
-  testcase1 = expand_direction(testcase1);
-  testcase1 = expand_generational(testcase1);
-
-   for(auto it = testcase1.begin(); it < testcase1.end(); ++it){
-    cout<<*it<<endl;
+  cout<<"test 2 is ";
+  if(test_is_valid(testcase1)){
+    cout<<"true"<<endl;
+  }else{
+    cout << "false"<<endl;
   }
   
   return 0;
 }
-
 
 vector<string> string_to_vector(string input) {
   vector<string> output;
@@ -112,7 +123,10 @@ vector<string> expand_direction(vector<string> input){
   for(auto it = input.begin(); it < input.end(); it++){
     auto middle = string_to_vector(*it);
     string space = string(" ");
-    vectorbuilder.push_back(middle[2] +space+ opposite_direction(middle[1])+space+middle[0]);
+    string push_string = middle[2] +space+ opposite_direction(middle[1])+space+middle[0];
+    if(!vector_contains(vectorbuilder,push_string) && !vector_contains(input,push_string)){
+      vectorbuilder.push_back(middle[2] +space+ opposite_direction(middle[1])+space+middle[0]);
+    }
   }
   vector<string> output;
   output.reserve(input.size()+vectorbuilder.size());
@@ -134,8 +148,10 @@ vector<string> expand_generational(vector<string> input){
 	auto jsplit = string_to_vector(*jit);
 	if(jsplit[0] == splitcurrent[0]){
 	  if(splitcurrent[1] == opposite_direction(jsplit[1])){
-	    vectorbuilder.push_back(string(jsplit[2]+ " " +  opposite_direction(jsplit[1])+" "+ splitcurrent[2]));
-
+	    string push_string = string(string(jsplit[2]+ " " +  opposite_direction(jsplit[1])+" "+ splitcurrent[2]));
+	    if(!vector_contains(vectorbuilder,push_string) && !vector_contains(input,push_string)){
+	      vectorbuilder.push_back(push_string);
+	    }
 	  }
 	}
 
@@ -145,7 +161,7 @@ vector<string> expand_generational(vector<string> input){
   
   vectorbuilder.insert(vectorbuilder.end(),input.begin(),input.end());
   return vectorbuilder;
-}
+};
 
 directions hashit (std::string const& input){
   if (input == "n") return north;
@@ -158,4 +174,35 @@ directions hashit (std::string const& input){
   if (input == "se") return southeast;
 
   return north;
+};
+bool vector_contains(vector<string> input_vector,string input){
+
+  if(std::find(input_vector.begin(), input_vector.end(),input) != input_vector.end()) {
+    return true;
+  } else{
+    return false;
+  }
+};
+
+bool valid_or_not(vector<string> input){
+  for(auto it = input.begin(); it < input.end(); ++it){
+    auto current_pos = *it;
+    for(auto jit = input.begin(); jit < input.end(); ++jit){
+      if(*jit != current_pos){// not looking at current value
+	auto current_split = string_to_vector(current_pos);
+	auto j_split = string_to_vector(*jit);
+	if(current_split[0] == j_split[0] && current_split[2] == j_split[2] && opposite_direction(current_split[1]) ==  j_split[1]) { // Found a contradiction return invalid
+	  return false;
+	}
+      }
+    }
+  }
+  return true;
+};
+
+bool test_is_valid(vector<string> testcase){
+  testcase = break_apart_directions(testcase); 
+  testcase = expand_direction(testcase);
+  testcase = expand_generational(testcase);
+  return valid_or_not(testcase);
 };
